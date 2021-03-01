@@ -1,0 +1,46 @@
+---
+- name: Check if ESET is already installed
+  stat:
+    path: "{{ eset_installation_folder }}/sbin/lic"
+  changed_when: false
+  check_mode: false
+  register: eset_installed
+
+- name: Retrieve ESET current version
+  shell: "{{ eset_installation_folder }}/sbin/lic --version | awk '{ print $3 }'"
+  changed_when: false
+  check_mode: false
+  register: current_eset_version
+  when: eset_installed.stat.exists
+
+- name: Check if ESET needs to be installed/updated
+  set_fact:
+    installation_required: "{{ not eset_installed.stat.exists or current_eset_version.stdout is version(eset_version, '!=') }}"
+
+- name: Install ESET
+  when: installation_required
+  block:
+    - name: Download ESET bin
+      get_url:
+        url: "{{ eset_download_url }}"
+        dest: "{{ eset_download_dir }}"
+        mode: '0755'
+
+    - name: Install ESET
+      command: "{{ eset_download_dir }}/{{ eset_download_url | basename }} --no-gui --accept-license --force-install"
+
+  always:
+    - name: Remove ESET installation script
+      file:
+        path: "{{ eset_download_dir }}/{{ eset_download_url | basename }}"
+        state: absent
+
+- name: Check ESET license status
+  command: "{{ eset_installation_folder }}/sbin/lic --status"
+  changed_when: false
+  check_mode: false
+  register: eset_license_status
+
+- name: Activate ESET license
+  command: "{{ eset_installation_folder }}/sbin/lic -k {{ eset_license_key }}"
+  when: "'Not activated' in eset_license_status.stdout"
