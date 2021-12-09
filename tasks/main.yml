@@ -25,6 +25,7 @@
         url: "{{ eset_download_url }}"
         dest: "{{ eset_download_dir }}"
         mode: '0755'
+        timeout: "{{ eset_download_timeout }}"
 
     - name: Install ESET
       command: "{{ eset_download_dir }}/{{ eset_download_url | basename }} --no-gui --accept-license --force-install"

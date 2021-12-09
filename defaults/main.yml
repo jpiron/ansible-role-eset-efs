@@ -2,3 +2,4 @@
 eset_version: 7.2.574.0
 eset_download_url: https://download.eset.com/com/eset/apps/business/efs/linux/v{{ eset_version.split('.')[0] }}/{{ eset_version }}/efs.x86_64.bin
 eset_download_dir: /var/tmp/
+eset_download_timeout: 300
