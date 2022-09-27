@@ -45,4 +45,4 @@
 - name: Activate ESET license
   command: "{{ eset_installation_folder }}/sbin/lic -k {{ eset_license_key }}"
   when: ('Not activated' in eset_license_status.stdout) or 
-        ('Non activée' in eset_license_status.stdout)
+        ('Non activé' in eset_license_status.stdout)
